@@ -112,6 +112,7 @@ void main() {
         col = sampleSky();
     };
     
-    fragColor = vec4(h.dist < depth ? col.rgb : mc.rgb, 1.0); // if raytracer distance is smaller than mc distance, color raytracer
+    fragColor = vec4(vec3(depth / far), 1.0); //dasda
+    //fragColor = vec4(h.dist < depth ? col.rgb : mc.rgb, 1.0); // if raytracer distance is smaller than mc distance, color raytracer
     //fragColor = vec4(mix(vec3(depth), col.rgb, 0.0), 1.0); // blend the shader with mc
 }
