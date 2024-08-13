@@ -36,6 +36,15 @@ struct hit {
     material m;
 };
 
+float near = 0.1; 
+float far  = 1000.0;
+  
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0;
+    return (near * far) / (far + near - z * (far - near));    
+}
+
 vec4 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
     //float patternMask = mod(p.x + mod(p.y, 2.0), 2.0); // checkerboard on transparent
@@ -103,5 +112,6 @@ void main() {
         col = sampleSky();
     }
 
+    float depth = LinearizeDepth(texture(DiffuseDepthSampler, texCoord).r);
     fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
 }
