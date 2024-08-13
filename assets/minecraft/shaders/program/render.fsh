@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 uniform sampler2D DiffuseSampler;
 
@@ -34,6 +34,16 @@ struct hit {
     vec3 normal;
     material m;
 };
+
+vec4 floatToChannels(float n) {
+    int num = floatBitsToInt(n);
+    return vec4(
+        (num >> 24) & 0xff,
+        (num >> 16) & 0xff,
+        (num >>  8) & 0xff,
+        (num      ) & 0xff
+    ) / 255.0;
+}
 
 vec4 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
@@ -87,7 +97,7 @@ void main() {
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
     
     ray r;
-    r.origin = pos * -1.0;
+    r.origin = pos * -1.0; // dont fucking ask me why its inverted
     r.direction = normalize(uv) * mat3(mvmat);
 
     hit h;
@@ -98,8 +108,11 @@ void main() {
     sceneTrace(r, h);
     col = vec4((h.normal + 1.0) * 0.5, 1.0);
 
-    if (h.dist == MAXDIST) {
-        col = sampleSky();
-    };
-    fragColor = col; // send raw raytracer to swap
+    if (h.dist == MAXDIST) col = sampleSky();
+
+    float channel = mod(gl_FragCoord.x, 2.0) + mod(gl_FragCoord.y, 2.0) * 2.0; // thx for this dom and Raccoon
+    if (channel == 0.0) fragColor = floatToChannels(col.r); // encode tha shit
+    if (channel == 1.0) fragColor = floatToChannels(col.g);
+    if (channel == 2.0) fragColor = floatToChannels(col.b);
+    if (channel == 3.0) fragColor = floatToChannels(col.a);
 }
