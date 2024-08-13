@@ -1,7 +1,7 @@
 # Vanilla Shader Raytracing in Minecraft
 Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the concept of passing core values into post shaders
 
-https://github.com/user-attachments/assets/92a54ec2-2506-47b5-baf6-ef9590105bff
+https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
 
 The core shader transforms the vertices of the item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 
