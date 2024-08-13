@@ -102,5 +102,5 @@ void main() {
         col = sampleSky();
     };
     
-    fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
+    fragColor = col; // send raw raytracer to swap
 }
