@@ -16,9 +16,6 @@ out vec4 fragColor;
 in mat4 mvmat;
 in vec3 pos;
 
-#define MINDIST 0.01
-#define MAXDIST 10000.0
-
 struct ray {
     vec3 origin;
     vec3 direction;
