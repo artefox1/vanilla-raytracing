@@ -6,7 +6,9 @@
         "particles",
         "clouds",
         "weather",
-        "final"
+        "final",
+        "render",
+        "test"
     ],
     "passes": [
         {
@@ -61,13 +63,18 @@
             ]
         },
         {
-            "name": "test",
+            "name": "render",
             "intarget": "final",
+            "outtarget": "swap"
+        },
+        {
+            "name": "swap",
+            "intarget": "render",
             "outtarget": "minecraft:main",
             "auxtargets": [
                 {
-                    "name": "DiffuseDepthSampler",
-                    "id": "minecraft:main:depth"
+                    "name": "DefaultSampler",
+                    "id": "minecraft:main"
                 }
             ]
         }

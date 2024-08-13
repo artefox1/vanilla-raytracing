@@ -50,7 +50,7 @@ data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ### Fragment shader
 All of the raytracing is actually written in `program/test.fsh`.
 
-To overlay the raytracer on the minecraft buffer, I used the `mix()` function to lerp along the `alpha` channel. TODO: No i didnt
+To overlay the raytracer on the minecraft buffer, I used the `mix()` function to lerp along the `alpha` channel.
 ```glsl
 vec4 mc = texture(DiffuseSampler, texCoord); // default minecraft buffer
 vec4 color;                                  // overlay shader
