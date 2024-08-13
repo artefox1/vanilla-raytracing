@@ -39,8 +39,7 @@ struct hit {
 float near = 0.1; 
 float far  = 1000.0;
   
-float LinearizeDepth(float depth) 
-{
+float linearizeDepth(float depth) { // onnowheres aweosme function
     float z = depth * 2.0 - 1.0;
     return (near * far) / (far + near - z * (far - near));    
 }
@@ -91,7 +90,8 @@ void sceneTrace(ray r, inout hit h) {
 }
 
 void main() {
-    vec4 mc = texture(DiffuseSampler, texCoord); // default mc
+    vec4 mc = texture(DiffuseSampler, texCoord);                            // default mc
+    float depth = linearizeDepth(texture(DiffuseDepthSampler, texCoord).r); // default mc depth
 
     vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
@@ -110,8 +110,8 @@ void main() {
 
     if (h.dist == MAXDIST) {
         col = sampleSky();
-    }
-
-    float depth = LinearizeDepth(texture(DiffuseDepthSampler, texCoord).r);
-    fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
+    };
+    
+    fragColor = vec4(h.dist < depth ? col.rgb : mc.rgb, 1.0); // if raytracer distance is smaller than mc distance, color raytracer
+    //fragColor = vec4(mix(vec3(depth), col.rgb, 0.0), 1.0); // blend the shader with mc
 }

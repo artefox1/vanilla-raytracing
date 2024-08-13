@@ -63,7 +63,13 @@
         {
             "name": "test",
             "intarget": "final",
-            "outtarget": "minecraft:main"
+            "outtarget": "minecraft:main",
+            "auxtargets": [
+                {
+                    "name": "DiffuseDepthSampler",
+                    "id": "minecraft:main:depth"
+                }
+            ]
         }
     ]
 }
