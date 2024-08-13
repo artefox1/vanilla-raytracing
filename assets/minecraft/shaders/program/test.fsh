@@ -91,7 +91,7 @@ void sceneTrace(ray r, inout hit h) {
 
 void main() {
     vec4 mc = texture(DiffuseSampler, texCoord);                            // default mc
-    float depth = linearizeDepth(texture(DiffuseDepthSampler, texCoord).r); // default mc depth
+    float depth = linearizeDepth(texture(DiffuseDepthSampler, texCoord).r); // default mc depth why DOES THIS NOT WORK
 
     vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
