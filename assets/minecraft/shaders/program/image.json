@@ -5,7 +5,7 @@
         "dstrgb": "1-srcalpha"
     },
     "vertex": "blit",
-    "fragment": "swap",
+    "fragment": "image",
     "attributes": [ "Position" ],
     "samplers": [
         { "name": "DiffuseSampler" },

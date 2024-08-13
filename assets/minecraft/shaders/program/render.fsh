@@ -101,6 +101,6 @@ void main() {
     if (h.dist == MAXDIST) {
         col = sampleSky();
     };
-    
+    col.rgb /= 100.0;
     fragColor = col; // send raw raytracer to swap
 }
