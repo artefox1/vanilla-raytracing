@@ -1,6 +1,6 @@
 #version 330
 
-uniform sampler2D DefaultSampler;
+//uniform sampler2D DefaultSampler;
 uniform sampler2D DiffuseSampler;
 
 uniform vec4 ColorModulate;
@@ -23,18 +23,20 @@ float channelsToFloat(vec4 n) { // decoder
 }
 
 float dec(ivec2 relative) {
-    return channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord) * 2 + relative, 0));
+    return channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy) * 2 + relative, 0));
 }
 
 void main() {
-    vec4 mc  = texture(DefaultSampler, texCoord); // default mc
+    //vec4 mc  = texture(DefaultSampler, texCoord); // default mc
 
     vec4 col = vec4(
-        dec(ivec2(0, 0)), // decode
-        dec(ivec2(1, 0)),
-        dec(ivec2(0, 1)),
-        dec(ivec2(1, 1))
+        channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy) * 2 + ivec2(0, 0), 0)), // decode
+        channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy) * 2 + ivec2(1, 0), 0)),
+        channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy) * 2 + ivec2(0, 1), 0)),
+        channelsToFloat(texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy) * 2 + ivec2(1, 1), 0))
     ); // raytracer
-    //fragColor = vec4(vec3(col), 1.0);
-    fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
+    //vec4 col = texelFetch(DiffuseSampler, ivec2(gl_FragCoord.xy), 0);
+    //vec4 col = texture(DiffuseSampler, texCoord);
+    fragColor = vec4(vec3(col), 1.0);
+    //fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
 }

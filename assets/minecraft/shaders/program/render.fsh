@@ -110,9 +110,17 @@ void main() {
 
     if (h.dist == MAXDIST) col = sampleSky();
 
-    float channel = mod(gl_FragCoord.x, 2.0) + mod(gl_FragCoord.y, 2.0) * 2.0; // thx for this dom and Raccoon
-    if (channel == 0.0) fragColor = floatToChannels(col.r); // encode tha shit
-    if (channel == 1.0) fragColor = floatToChannels(col.g);
-    if (channel == 2.0) fragColor = floatToChannels(col.b);
-    if (channel == 3.0) fragColor = floatToChannels(col.a);
+    //col = vec4(1.0, 0.0, 1.0, 0.0);
+
+    //float channel = mod(gl_FragCoord.x, 2.0) * 2.0 + mod(gl_FragCoord.y, 2.0); // thx for this dom and Raccoon
+    //int channel = (int(mod(gl_FragCoord.x, 2.0)) << 1) | int(mod(gl_FragCoord.y, 2.0));
+    vec2 channel = vec2(mod(gl_FragCoord.x - 0.5, 2.0), mod(gl_FragCoord.y - 0.5, 2.0));
+
+    vec4 encodedCol;
+    if (channel == vec2(0.0, 0.0)) encodedCol = floatToChannels(col.r);
+    if (channel == vec2(0.0, 1.0)) encodedCol = floatToChannels(col.g);
+    if (channel == vec2(1.0, 0.0)) encodedCol = floatToChannels(col.b);
+    if (channel == vec2(1.0, 1.0)) encodedCol = floatToChannels(col.a);
+
+    fragColor = encodedCol;
 }
