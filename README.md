@@ -1,6 +1,11 @@
 # Vanilla Shader Raytracing in Minecraft
-This document needs reworking
+This branch is under construction.
 
 Check out the secondary `basic-raytracing` branch for the basic version of this project
 
-Credit to [Godlander](https://github.com/Godlander/raytracing), Dominexis and d for the concept of passing core values into post shaders
+**Credits:**
+[Godlander](https://github.com/Godlander/raytracing)
+
+Dominexis for some of the channel encoding ideas/code
+
+d for explaining the concept of passing core values into post shaders

@@ -91,9 +91,9 @@ void sceneTrace(ray r, inout hit h) {
 }
 
 void main() {
-    vec4 mc = texture(DiffuseSampler, texCoord); // default mc
+    vec4 mc = texture(DiffuseSampler, texCoord * 2.0); // default mc
 
-    vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
+    vec3 uv = vec3((texCoord * 2.0) * 2.0 - 1.0, -1.0); // coords from -1 to 1  we need to multiply texCoord by 2 because we are writing to a buffer 2x the size
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
     
     ray r;
@@ -113,14 +113,15 @@ void main() {
     //col = vec4(1.0, 0.0, 1.0, 0.0);
 
     //float channel = mod(gl_FragCoord.x, 2.0) * 2.0 + mod(gl_FragCoord.y, 2.0); // thx for this dom and Raccoon
+    float channel = mod(floor(gl_FragCoord.x), 2.0) + mod(floor(gl_FragCoord.y), 2.0) * 2.0;
     //int channel = (int(mod(gl_FragCoord.x, 2.0)) << 1) | int(mod(gl_FragCoord.y, 2.0));
-    vec2 channel = vec2(mod(gl_FragCoord.x - 0.5, 2.0), mod(gl_FragCoord.y - 0.5, 2.0));
+    //vec2 channel = vec2(mod(floor(gl_FragCoord.x), 2.0), mod(floor(gl_FragCoord.y), 2.0)); // fragcoord is centered in 0.5
 
     vec4 encodedCol;
-    if (channel == vec2(0.0, 0.0)) encodedCol = floatToChannels(col.r);
-    if (channel == vec2(0.0, 1.0)) encodedCol = floatToChannels(col.g);
-    if (channel == vec2(1.0, 0.0)) encodedCol = floatToChannels(col.b);
-    if (channel == vec2(1.0, 1.0)) encodedCol = floatToChannels(col.a);
+    if (channel == 0.0) encodedCol = floatToChannels(col.r); // bottom left
+    if (channel == 1.0) encodedCol = floatToChannels(col.g); // bottom right
+    if (channel == 2.0) encodedCol = floatToChannels(col.b); // top left
+    if (channel == 3.0) encodedCol = floatToChannels(col.a); // top right
 
     fragColor = encodedCol;
 }
