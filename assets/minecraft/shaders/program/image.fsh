@@ -14,6 +14,9 @@ out vec4 fragColor;
 
 void main() {
     vec4 mc  = texture(DefaultSampler, texCoord); // default mc
+    
     vec4 col = texture(DiffuseSampler, texCoord); // raytracer
+    col.rgb = pow(col.rgb, vec3(0.4545)); // gamma on raytracer
+
     fragColor = vec4(mix(mc.rgb, col.rgb, col.a), 1.0); // blend the shader with mc
 }
