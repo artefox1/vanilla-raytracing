@@ -22,17 +22,12 @@ struct ray {
 
 struct material {
     vec3 albedo;
-    vec3 emissive;
-    float percentSpecular;
     float roughness;
-    vec3 specularColor;
-    float ior;
 };
 
 struct hit {
     float dist;
     vec3 normal;
-    material m;
 };
 
 vec4 floatToChannels(float n) {
@@ -53,21 +48,23 @@ vec4 sampleSky() {
             0.52156862745,
             0.67058823529,
             1.00000000000,
-            0.00000000000
+            1.00000000000
         ); // copy mc sky color
 }
 
-void sphereTrace(ray r, inout hit h, vec4 s) { // s.xyz is pos, s.w is radius
+// General sphere intersection function. Doesnt affect material. Returns bool, edits hit distance, normal data
+// todo: add material shit cuz we dont want nested nodes.
+bool addSphere(ray r, inout hit h, vec4 s) {
 	vec3 m = r.origin - s.xyz;
 
 	float b = dot(m, r.direction);
 	float c = dot(m, m) - s.w * s.w;
 
-	//if (c > 0.0 && b > 0.0) return false;
+	if (c > 0.0 && b > 0.0) return false;
 
 	float d = b * b - c;
 
-	//if (d < 0.0) return false;
+	if (d < 0.0) return false;
     
     bool fromInside = false;
 	float dist = -b - sqrt(d);
@@ -80,14 +77,42 @@ void sphereTrace(ray r, inout hit h, vec4 s) { // s.xyz is pos, s.w is radius
 	if (dist > MINDIST && dist < h.dist) {
         h.dist = dist;        
         h.normal = normalize((r.origin + r.direction * dist) - s.xyz) * (fromInside ? -1.0 : 1.0);
-    //    return true;
+        return true;
     }
     
-    //return false;
+    return false;
 }
 
-void sceneTrace(ray r, inout hit h) {
-    sphereTrace(r, h, vec4(0.0, 0.0, -3.0, 1.0));
+void addPointLight(inout vec3 shade, hit h, vec3 pos, float intensity, vec3 color) { // directly ripped out of my 2-year old raytracer which was made by the help of UMSOEA
+    vec3 col;
+    vec3 vtol = pos - data.hit;
+    float ld = length(vtol);
+    vtol /= ld;
+
+    if (h.dist < MAXDIST) {
+        vec3 s = vec3(max(dot(data.n, vtol), 0.0) / (ld * ld));
+        col = (ray(data.hit, vtol).d > ld ? s : vec3(0.0)) * intensity * color;
+    }
+    
+    shade += col;
+}
+
+void sceneTrace(ray r, inout hit h) { // this intersection does affect material
+    if (addSphere(r, h, vec4(0.0, 0.0, -3.0, 1.0))) {
+        hit.m.albedo = vec3(1.0, 0.0, 0.0);
+        hit.m.roughness = 0.5;
+    }
+}
+
+vec3 shootRay(ray r) { // general raytracing color function. in main, return alpha 0 for sky if its in the first bounce for reflection.
+    hit h;
+    h.dist = MAXDIST; // start at max dist in case we dont hit anything
+
+    sceneTrace(r, h) // do za intersections
+}
+
+vec3 calculateLighting(hit h) {
+    
 }
 
 void main() {
@@ -97,7 +122,7 @@ void main() {
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
     
     ray r;
-    r.origin = pos * -1.0; // dont fucking ask me why its inverted
+    r.origin = pos * -1.0;
     r.direction = normalize(uv) * mat3(mvmat);
 
     hit h;
@@ -108,20 +133,8 @@ void main() {
     sceneTrace(r, h);
     col = vec4((h.normal + 1.0) * 0.5, 1.0);
 
-    if (h.dist == MAXDIST) col = sampleSky();
-
-    //col = vec4(1.0, 0.0, 1.0, 0.0);
-
-    //float channel = mod(gl_FragCoord.x, 2.0) * 2.0 + mod(gl_FragCoord.y, 2.0); // thx for this dom and Raccoon
-    float channel = mod(floor(gl_FragCoord.x), 2.0) + mod(floor(gl_FragCoord.y), 2.0) * 2.0;
-    //int channel = (int(mod(gl_FragCoord.x, 2.0)) << 1) | int(mod(gl_FragCoord.y, 2.0));
-    //vec2 channel = vec2(mod(floor(gl_FragCoord.x), 2.0), mod(floor(gl_FragCoord.y), 2.0)); // fragcoord is centered in 0.5
-
-    vec4 encodedCol;
-    if (channel == 0.0) encodedCol = floatToChannels(col.r); // bottom left
-    if (channel == 1.0) encodedCol = floatToChannels(col.g); // bottom right
-    if (channel == 2.0) encodedCol = floatToChannels(col.b); // top left
-    if (channel == 3.0) encodedCol = floatToChannels(col.a); // top right
-
-    fragColor = encodedCol;
+    if (h.dist == MAXDIST) {
+        col = sampleSky();
+    };
+    fragColor = col; // send raw raytracer to swap
 }
