@@ -1,4 +1,4 @@
-#version 330
+#version 150
 
 uniform sampler2D DiffuseSampler;
 
@@ -29,16 +29,6 @@ struct hit {
     float dist;
     vec3 normal;
 };
-
-vec4 floatToChannels(float n) {
-    int num = floatBitsToInt(n);
-    return vec4(
-        (num >> 24) & 0xff,
-        (num >> 16) & 0xff,
-        (num >>  8) & 0xff,
-        (num      ) & 0xff
-    ) / 255.0;
-}
 
 vec4 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
@@ -116,25 +106,21 @@ vec3 calculateLighting(hit h) {
 }
 
 void main() {
-    vec4 mc = texture(DiffuseSampler, texCoord * 2.0); // default mc
+    vec4 mc = texture(DiffuseSampler, texCoord); // default mc
 
-    vec3 uv = vec3((texCoord * 2.0) * 2.0 - 1.0, -1.0); // coords from -1 to 1  we need to multiply texCoord by 2 because we are writing to a buffer 2x the size
+    vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
     uv.x *= 1920.0 / 1080.0; // correct aspect ratio
     
     ray r;
     r.origin = pos * -1.0;
-    r.direction = normalize(uv) * mat3(mvmat);
+    r.direction = normalize(uv) * mat3(mvmat); // is just a direction not changing with ro
 
-    hit h;
-    h.dist = MAXDIST;
+    vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+    col.rgb = calculateLighting(r); // might change to for loop when reflection bouncing
 
-    vec4 col;
-
-    sceneTrace(r, h);
-    col = vec4((h.normal + 1.0) * 0.5, 1.0);
-
-    if (h.dist == MAXDIST) {
-        col = sampleSky();
+    if (h.dist == MAXDIST) { // sky alpha invisible if in main bounce
+        col.a = 0.0;
     };
+
     fragColor = col; // send raw raytracer to swap
 }
