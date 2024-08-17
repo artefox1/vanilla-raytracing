@@ -48,12 +48,12 @@ vec3 hitPoint(ray r, float dist) {
     return (r.direction * dist) + r.origin;
 }
 
-// General sphere intersection function. Affects material to not have nested functions. edits hit metadata
+// General sphere intersection function. Affects material to not have nested functions. edits hit metadata  s.xyz is position, s.w is radius
 void addSphere(ray r, inout hit h, vec4 s, material m) {
-	vec3 m = r.origin - s.xyz;
+	vec3 pos = r.origin - s.xyz;
 
-	float b = dot(m, r.direction);
-	float c = dot(m, m) - s.w * s.w;
+	float b = dot(pos, r.direction);
+	float c = dot(pos, pos) - s.w * s.w;
 
 	//if (c > 0.0 && b > 0.0) return false;
 
@@ -80,20 +80,14 @@ void addSphere(ray r, inout hit h, vec4 s, material m) {
     //return false;
 }
 
-hit sceneTrace(ray r) { // trying no void to be consistent with shadehitdata
-    hit h;
-    addSphere(r, h, vec4(0.0, 0.0, -3.0, 1.0), material(vec3(1.0, 0.0, 0.3), 0.5));
-    addSphere(r, h, vec4(0.3, 0.0, -2.0, 1.0), material(vec3(0.2, 0.2, 1.0), 0.2));
-    return h;
-}
-
 hit shootRay(ray r) { // general raytracing color function. does not shade anything.
     hit h;
     h.dist = MAXDIST; // start at max dist in case we dont hit anything
 
-    h = sceneTrace(r); // do za intersections
+    addSphere(r, h, vec4(0.0, 0.0, -3.0, 1.0), material(vec3(1.0, 0.0, 0.3), 0.5));
+    addSphere(r, h, vec4(0.3, 0.0, -2.0, 1.0), material(vec3(0.2, 0.2, 1.0), 0.2));
 
-    //h.m.reflectivity = mix(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 1.0, h.m.reflectivity);
+    //h.m.reflectivity = mix(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 1.0, h.m.reflectivity); // shitty fresnel
 
     return h;
 }
@@ -101,10 +95,10 @@ hit shootRay(ray r) { // general raytracing color function. does not shade anyth
 void addPointLight(inout vec3 shade, ray r, hit h, vec4 l, vec3 color) { // passes like this have inout data   l.xyz is pos, l.w is intesnity
     vec3 vectorToLight = l.xyz - hitPoint(r, h.dist);
     float lightDistance = length(vectorToLight);
-    vectorToLight /= lightDistance; // normalize
+    vectorToLight /= lightDistance; // normalize  I do it this way to preserve lightDistance. its a shitty optimization but who tf cares
 
-    vec3 s = vec3(max(dot(h.normal, vectorToLight), 0.0) / (lightDistance * lightDistance)); // woohoo inverse square law
-    vec3 col = (shootRay(ray(hitPoint(r, h.dist), vectorToLight)).dist > lightDistance ? s : vec3(0.0)) * l.w * color; // cast shadow ray then multiply by intensity and color
+    vec3 lightness = vec3(max(dot(h.normal, vectorToLight), 0.0) / (lightDistance * lightDistance)); // woohoo inverse square law
+    vec3 col = (shootRay(ray(hitPoint(r, h.dist), vectorToLight)).dist > lightDistance ? lightness : vec3(0.0)) * l.w * color; // cast shadow ray then multiply by intensity and color
     
     shade += col;
 }
@@ -120,8 +114,6 @@ vec3 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point
 }
 
 void main() {
-    vec4 mc = texture(DiffuseSampler, texCoord); // default mc
-
     vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
     uv.x *= OutSize.x / OutSize.y; // correct aspect ratio
     
@@ -137,6 +129,5 @@ void main() {
     if (shootRay(r).dist == MAXDIST) { // sky alpha invisible if in main bounce
         col.a = 0.0;
     };
-
     fragColor = col; // send raw raytracer to swap
 }
