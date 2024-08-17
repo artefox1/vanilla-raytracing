@@ -94,8 +94,6 @@ d (DerDiscohund)
 
 Dominexis
 
-UMSOEA
+umsoea
 
 Onnowhere
-
-Bálint
