@@ -5,6 +5,7 @@ https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
 
 The core shader transforms the vertices of the item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 
+# Setup
 ## Usage
 The shader uses an `item_display` as a mud block to get the core values. To run the shader at world origin, simply run
 ```mcfunction
@@ -59,11 +60,11 @@ vec4 color;                                  // overlay shader
 mix(mc.rgb, color.rgb, color.a);             // blend the shader with minecraft
 ```
 
-## Credits
+# Credits
 [Godlander](https://github.com/Godlander/raytracing) for the idea of decoding view data in the vertex shader
 
 d (DerDiscohund) for explaining the whole concept of passing core shader values into the post shader
 
-Dominexis for some of the encoding concepts
+Dominexis for some of the encoding code
 
 UMSOEA for explaining raytracing and some intersection functions
