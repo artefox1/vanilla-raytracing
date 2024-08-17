@@ -37,11 +37,12 @@ vec3 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
     //float patternMask = mod(p.x + mod(p.y, 2.0), 2.0); // checkerboard on transparent
     //col = patternMask * vec4(1.0, 1.0, 1.0, 0.0) + vec4(0.7, 0.7, 0.7, 0.0); // white is technically more than white
-    return vec3(
+    vec3 col = vec3(
             0.52156862745,
             0.67058823529,
             1.00000000000
         ); // copy mc sky color
+    return pow(col, vec3(2.2));
 }
 
 vec3 hitPoint(ray r, float dist) {
@@ -80,6 +81,18 @@ void addSphere(ray r, inout hit h, vec4 s, material m) {
     //return false;
 }
 
+// general XZ plane
+void addPlane(ray r, inout hit h, float y, material m) { // y is height
+    float dist = (r.origin.y - y) / -r.direction.y;
+
+    if (dist > MINDIST && dist < h.dist) {
+        h.dist = dist;
+        h.normal = vec3(0.0, 1.0, 0.0); // normal straight up
+        h.m.albedo = m.albedo;
+        h.m.reflectivity = m.reflectivity;
+    }
+}
+
 hit shootRay(ray r) { // general raytracing color function. does not shade anything.
     hit h;
     h.dist = MAXDIST; // start at max dist in case we dont hit anything
@@ -87,6 +100,7 @@ hit shootRay(ray r) { // general raytracing color function. does not shade anyth
     addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec3(1.0, 1.0, 1.0), 0.5));
     addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec3(0.9, 0.1, 0.1), 0.2));
     addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec3(0.1, 0.9, 0.1), 0.2));
+    addPlane(r, h, 5.5, material(vec3(1.0, 1.0, 1.0), 1.0));
 
     //h.m.reflectivity = mix(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 1.0, h.m.reflectivity); // shitty fresnel
 
@@ -94,21 +108,25 @@ hit shootRay(ray r) { // general raytracing color function. does not shade anyth
 }
 
 void addPointLight(inout vec3 shade, ray r, hit h, vec4 l, vec3 color) { // passes like this have inout data   l.xyz is pos, l.w is intesnity
-    vec3 vectorToLight = l.xyz - hitPoint(r, h.dist);
+    vec3 point = hitPoint(r, h.dist);
+
+    vec3 vectorToLight = l.xyz - point;
     float lightDistance = length(vectorToLight);
     vectorToLight /= lightDistance; // normalize  I do it this way to preserve lightDistance. its a shitty optimization but who tf cares
 
     vec3 lightness = vec3(max(dot(h.normal, vectorToLight), 0.0) / (lightDistance * lightDistance)); // woohoo inverse square law
-    vec3 col = (shootRay(ray(hitPoint(r, h.dist), vectorToLight)).dist > lightDistance ? lightness : vec3(0.0)) * l.w * color; // cast shadow ray then multiply by intensity and color
+
+    hit rayToLight = shootRay(ray(point, vectorToLight));
+    vec3 col = (rayToLight.dist > lightDistance ? lightness : vec3(0.0)) * l.w * color; // cast shadow ray then multiply by intensity and color
     
     shade += col;
 }
 
-vec3 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point
+vec3 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point, in the future calc hitpoiunt in the intersection as well as dist.
     vec3 shade;
 
-    addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 25.0), vec3(1.0, 0.9, 0.8));
-    addPointLight(shade, r, h, vec4(-2.0, 8.0, 3.4, 5.0), vec3(0.6, 0.5, 0.9));
+    addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec3(1.0, 0.9, 0.8));
+    addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec3(0.6, 0.5, 0.9));
 
     shade *= h.m.albedo; // tint by albedo
     if (h.dist == MAXDIST) shade = sampleSky();
@@ -121,7 +139,7 @@ void main() {
     uv.x *= OutSize.x / OutSize.y; // correct aspect ratio
     
     ray r;
-    r.origin = pos * -1.0;
+    r.origin = -pos; // dont FUCKING ask me why its inverted
     r.direction = normalize(uv) * mat3(mvmat); // is just a direction vector not changing with ro
 
     vec4 col = vec4(0.0, 0.0, 0.0, 1.0);

@@ -37,7 +37,7 @@ plot(vec2(3.0, 1.0), data.w, col); // encode data.w to (3, 1) on the screen
 ## Post shaders
 The post shaders are located in `shaders/program`.
 ### Vertex shader
-The code for decoding color data is located in `program/test.vsh`.
+The code for decoding color data is located in `program/render.vsh`.
 
 To decode data, use the `dec()` function. Unlike the encoding function in `core`, this function **does** return a value. Another inconsistency is that the texture coordinates here uses `ivec2` instead of `vec2`. It's not my biggest concern to fix this.
 ```glsl
@@ -48,7 +48,7 @@ data.z = dec(ivec2(2, 1)); // decode (2, 1) to data.z
 data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ```
 ### Fragment shader
-All of the raytracing is actually written in `program/test.fsh`.
+All of the raytracing is actually written in `program/render.fsh`.
 
 To overlay the raytracer on the minecraft buffer, I used the `mix()` function to lerp along the `alpha` channel.
 ```glsl
