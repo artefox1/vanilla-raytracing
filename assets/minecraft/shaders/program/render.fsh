@@ -45,11 +45,11 @@ vec3 sampleSky() {
 }
 
 vec3 hitPoint(ray r, float dist) {
-    return r.direction * dist + r.origin;
+    return (r.direction * dist) + r.origin;
 }
 
 // General sphere intersection function. Affects material to not have nested functions. edits hit metadata
-void addSphere(ray r, inout hit h, vec4 s, vec3 albedo, float reflectivity) {
+void addSphere(ray r, inout hit h, vec4 s, material m) {
 	vec3 m = r.origin - s.xyz;
 
 	float b = dot(m, r.direction);
@@ -72,8 +72,8 @@ void addSphere(ray r, inout hit h, vec4 s, vec3 albedo, float reflectivity) {
 	if (dist > MINDIST && dist < h.dist) { // hit passed, change hit metadata
         h.dist = dist;        
         h.normal = normalize((r.origin + r.direction * dist) - s.xyz) * (fromInside ? -1.0 : 1.0); // flip if inside (I ripped this out of my old path tracer. I don't know why I invert it. THeres probably a good reason.)
-        h.m.albedo = albedo;
-        h.m.reflectivity = reflectivity;
+        h.m.albedo = m.albedo;
+        h.m.reflectivity = m.reflectivity;
         //return true;
     }
     
@@ -82,8 +82,8 @@ void addSphere(ray r, inout hit h, vec4 s, vec3 albedo, float reflectivity) {
 
 hit sceneTrace(ray r) { // trying no void to be consistent with shadehitdata
     hit h;
-    addSphere(r, h, vec4(0.0, 0.0, -3.0, 1.0), vec3(1.0, 0.0, 0.3), 0.5);
-    addSphere(r, h, vec4(0.3, 0.0, -2.0, 1.0), vec3(0.2, 0.2, 1.0), 0.2);
+    addSphere(r, h, vec4(0.0, 0.0, -3.0, 1.0), material(vec3(1.0, 0.0, 0.3), 0.5));
+    addSphere(r, h, vec4(0.3, 0.0, -2.0, 1.0), material(vec3(0.2, 0.2, 1.0), 0.2));
     return h;
 }
 
@@ -113,10 +113,10 @@ vec3 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point
     vec3 shade;
     addPointLight(shade, r, h, vec4(0.5, 3.0, -2.5, 10.0), vec3(0.5, 1.0, 0.5));
 
-    shade *= h.m.albedo;
+    shade *= h.m.albedo; // tint by albedo
     if (h.dist == MAXDIST) shade = sampleSky();
 
-    return shade; // tint by albedo
+    return shade;
 }
 
 void main() {
@@ -130,6 +130,8 @@ void main() {
     r.direction = normalize(uv) * mat3(mvmat); // is just a direction vector not changing with ro
 
     vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // THE ALMIGHTY FUNCTION
     col.rgb = shadeHitData(r, shootRay(r));
 
     if (shootRay(r).dist == MAXDIST) { // sky alpha invisible if in main bounce
