@@ -53,9 +53,9 @@ All of the raytracing is actually written in `program/render.fsh`.
 To edit object data, use one of the intersection functions in the `shootRay()` function. The intersection functions require data like positions and a `material`. As of now, `material` structs consists of `vec4 albedo` and `float reflectivity`. The default scene looks like this:
 ```glsl
 // addSphere(ray r, hit h, vec4 s, material m) - s.xyz is position, s.w is radius
-addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));  // white sphere of 1.0 radius and 0.5 reflectivity
+addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0),  material(vec4(1.0, 1.0, 1.0, 1.0), 0.5)); // white sphere of 1.0 radius and 0.5 reflectivity
 addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2)); // red sphere of 0.75 radius and 0.2 reflectivity
-addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));   // green sphere of 0.4 radius and 0.2 reflectivity
+addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4),   material(vec4(0.1, 0.9, 0.1, 1.0), 0.2)); // green sphere of 0.4 radius and 0.2 reflectivity
 
 // addPlane(ray r, hit h, float y, material m) - y is plane height
 addPlane(r, h, 5.5, material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // plane at Y = 5.5, 1 reflectivity and 0 alpha, which results in an invisible shadow caster
@@ -78,10 +78,10 @@ mix(mc.rgb, color.rgb, color.a);             // blend the shader with minecraft
 ```
 
 # Credits
-[Godlander](https://github.com/Godlander/raytracing) for the idea of decoding view data in the vertex shader
+Godlander
 
-d (DerDiscohund) for explaining the whole concept of passing core shader values into the post shader
+d (DerDiscohund)
 
-Dominexis for some of the encoding code
+Dominexis
 
-UMSOEA for explaining raytracing and some intersection functions
+UMSOEA
