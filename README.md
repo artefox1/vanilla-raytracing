@@ -50,7 +50,15 @@ data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ### Fragment shader
 All of the raytracing is actually written in `program/render.fsh`.
 
-To edit object data, use one of the intersection functions in the `shootRay()` function. The intersection functions require data like positions and a `material`. As of now, `material` structs consists of `vec4 albedo` and `float reflectivity`. The default scene looks like this:
+To edit the scene, simply use one of the intersection functions in the `shootRay()` function. Intersection functions require some kind of position data and `material` data. Some functions may store different types of data in the same `vec4` to save space. For example, the sphere intersection will use `vec4.xyz` for its position and `vec4.w` for its radius. As of now, the `material` struct consists of:
+```glsl
+struct material {
+    vec4 albedo;
+    float reflectivity;
+};
+```
+
+The default scene looks like this:
 ```glsl
 // addSphere(ray r, hit h, vec4 s, material m) - s.xyz is position, s.w is radius
 addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0),  material(vec4(1.0, 1.0, 1.0, 1.0), 0.5)); // white sphere of 1.0 radius and 0.5 reflectivity
