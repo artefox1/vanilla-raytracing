@@ -3,6 +3,8 @@ Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the con
 
 https://github.com/user-attachments/assets/6c65f8c0-3c9d-48ce-90b7-de4070d58833
 
+![2024-08-17_15 50 22](https://github.com/user-attachments/assets/9975dd17-fc12-473e-bf5d-0b310ebe3654)
+
 https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
 
 The core shader transforms the vertices of an item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
