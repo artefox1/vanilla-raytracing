@@ -23,7 +23,7 @@ struct ray {
 };
 
 struct material {
-    vec3 albedo;
+    vec4 albedo; // OMG 4 CHANNELS LETS GOOOOOOOOOOOOOOO
     float reflectivity;
 };
 
@@ -33,16 +33,18 @@ struct hit {
     material m;
 };
 
-vec3 sampleSky() {
+vec4 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
     //float patternMask = mod(p.x + mod(p.y, 2.0), 2.0); // checkerboard on transparent
     //col = patternMask * vec4(1.0, 1.0, 1.0, 0.0) + vec4(0.7, 0.7, 0.7, 0.0); // white is technically more than white
-    vec3 col = vec3(
+    vec4 col = vec4(
             0.52156862745,
             0.67058823529,
+            1.00000000000,
             1.00000000000
         ); // copy mc sky color
-    return pow(col, vec3(2.2));
+    col.rgb = pow(col.rgb, vec3(2.2)); // transform to linear space
+    return col;
 }
 
 vec3 hitPoint(ray r, float dist) {
@@ -97,38 +99,45 @@ hit shootRay(ray r) { // general raytracing color function. does not shade anyth
     hit h;
     h.dist = MAXDIST; // start at max dist in case we dont hit anything
 
-    addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec3(1.0, 1.0, 1.0), 0.5));
-    addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec3(0.9, 0.1, 0.1), 0.2));
-    addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec3(0.1, 0.9, 0.1), 0.2));
-    addPlane(r, h, 5.5, material(vec3(1.0, 1.0, 1.0), 1.0));
+    addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
+    addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
+    addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
+    addPlane(r, h, 5.5, material(vec4(1.0, 1.0, 1.0, 0.0), 1.0));
 
     //h.m.reflectivity = mix(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 1.0, h.m.reflectivity); // shitty fresnel
 
     return h;
 }
 
-void addPointLight(inout vec3 shade, ray r, hit h, vec4 l, vec3 color) { // passes like this have inout data   l.xyz is pos, l.w is intesnity
+void addPointLight(inout vec4 shade, ray r, hit h, vec4 l, vec4 color) { // passes like this have inout data (thanks for UMSOEA for explaining this to me like 2 years ago)  l.xyz is pos, l.w is intesnity
+    vec4 ambient = vec4(0.04, 0.04, 0.04, 0.04);
     vec3 point = hitPoint(r, h.dist);
 
     vec3 vectorToLight = l.xyz - point;
     float lightDistance = length(vectorToLight);
     vectorToLight /= lightDistance; // normalize  I do it this way to preserve lightDistance. its a shitty optimization but who tf cares
 
-    vec3 lightness = vec3(max(dot(h.normal, vectorToLight), 0.0) / (lightDistance * lightDistance)); // woohoo inverse square law
+    // shading part
+    float lightness = max(dot(h.normal, vectorToLight), 0.0); // 1d lightness
+    vec4 lighting = vec4((lightness + ambient) / (lightDistance * lightDistance)); // 4d lightness with inverse square law
 
-    hit rayToLight = shootRay(ray(point, vectorToLight));
-    vec3 col = (rayToLight.dist > lightDistance ? lightness : vec3(0.0)) * l.w * color; // cast shadow ray then multiply by intensity and color
+    // cast shadow ray then multiply by intensity and color
+    hit rayToLight = shootRay(ray(point, vectorToLight)); // actual distance to light (could get obstructed)
+    lighting *= rayToLight.dist > lightDistance ? vec4(1.0) : ambient; // 0.05x if in shadow
+    vec4 col = lighting * vec4(l.w) * color; // lighting is 4d
     
     shade += col;
 }
 
-vec3 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point, in the future calc hitpoiunt in the intersection as well as dist.
-    vec3 shade;
+vec4 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point, in the future calc hitpoiunt in the intersection as well as dist.
+    vec4 shade;
 
-    addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec3(1.0, 0.9, 0.8));
-    addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec3(0.6, 0.5, 0.9));
+    addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
+    addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec4(0.6, 0.5, 0.9, 1.0));
 
-    shade *= h.m.albedo; // tint by albedo
+    shade.rgb *= h.m.albedo.rgb; // tint by albedo
+    shade.a   += h.m.albedo.a;   // ADD alpha
+
     if (h.dist == MAXDIST) shade = sampleSky();
 
     return shade;
@@ -142,10 +151,10 @@ void main() {
     r.origin = -pos; // dont FUCKING ask me why its inverted
     r.direction = normalize(uv) * mat3(mvmat); // is just a direction vector not changing with ro
 
-    vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 col;
 
     // THE ALMIGHTY FUNCTION
-    col.rgb = shadeHitData(r, shootRay(r));
+    col = shadeHitData(r, shootRay(r));
 
     if (shootRay(r).dist == MAXDIST) { // sky alpha invisible if in main bounce
         col.a = 0.0;
