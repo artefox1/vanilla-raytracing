@@ -58,10 +58,10 @@ struct material {
 
 The default scene looks like this:
 ```glsl
-//              Position and Radius           Albedo and Reflectivity
-addSphere(r, h, vec4(-0.5,  6.5,  -3.0, 1.0 ), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
-addSphere(r, h, vec4( 0.9,  6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
-addSphere(r, h, vec4( 0.7,  5.9,  -2.5, 0.4 ), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
+//              Position and Radius              Albedo and Reflectivity
+addSphere(r, h, vec4(-0.5,  6.5,  -3.0, 1.0 ),   material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
+addSphere(r, h, vec4( 0.9,  6.25, -3.5, 0.75),   material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
+addSphere(r, h, vec4( 0.7,  5.9,  -2.5, 0.4 ),   material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
 
 //             Plane height   Albedo and Reflectivity
 addPlane(r, h, 5.5,           material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // 0 alpha which results in an invisible shadow caster
