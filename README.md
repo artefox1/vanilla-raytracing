@@ -5,7 +5,6 @@ https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
 
 The core shader transforms the vertices of the item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 
-# Setup
 ## Usage
 The shader uses an `item_display` as a mud block to get the core values. To run the shader at world origin, simply run
 ```mcfunction
@@ -50,6 +49,24 @@ data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ```
 ### Fragment shader
 All of the raytracing is actually written in `program/render.fsh`.
+
+To edit object data, use one of the intersection functions in the `shootRay()` function. The intersection functions require data like positions and a `material`. As of now, `material` structs consists of `vec4 albedo` and `float reflectivity`. The default scene looks like this:
+```glsl
+// addSphere(ray r, hit h, vec4 s, material m) - s.xyz is position, s.w is radius
+addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));  // white sphere of 1.0 radius and 0.5 reflectivity
+addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2)); // red sphere of 0.75 radius and 0.2 reflectivity
+addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));   // green sphere of 0.4 radius and 0.2 reflectivity
+
+// addPlane(ray r, hit h, float y, material m) - y is plane height
+addPlane(r, h, 5.5, material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // plane at Y = 5.5, 1 reflectivity and 0 alpha, which results in an invisible shadow caster
+```
+
+To add lights, use `addPointLight()` which is located in the `shadeHitData()` function. The default lighting scene looks like:
+```glsl
+// addPointLight(vec4 shade, ray r, hit h, vec4 l, vec4 color) - l.xyz is position, l.w is intensity
+addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0)); // warm light with 35 intensity
+addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec4(0.6, 0.5, 0.9, 1.0)); // blue light with 3 intensity
+```
 
 The raytracer then gets passed into `program/image.fsh`. This is where any color transformations such as tonemapping take place, and it's the image that gets shown on the final buffer.
 
