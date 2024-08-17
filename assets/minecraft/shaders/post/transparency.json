@@ -7,7 +7,7 @@
         "clouds",
         "weather",
         "final",
-        {"name":"swap", "width":3840, "height":2160}
+        "swap"
     ],
     "passes": [
         {
