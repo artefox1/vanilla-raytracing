@@ -50,7 +50,7 @@ data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ### Fragment shader
 All of the raytracing is actually written in `program/render.fsh`.
 
-The raytracer then gets passed into `program/image.fsh`. This is where any color transformations such as tonemapping take place, and the image that gets shown on the final buffer.
+The raytracer then gets passed into `program/image.fsh`. This is where any color transformations such as tonemapping take place, and it's the image that gets shown on the final buffer.
 
 To overlay the raytracer on the minecraft buffer, I used the `mix()` function to lerp along the `alpha` channel.
 ```glsl
@@ -58,3 +58,12 @@ vec4 mc = texture(DiffuseSampler, texCoord); // default minecraft buffer
 vec4 color;                                  // overlay shader
 mix(mc.rgb, color.rgb, color.a);             // blend the shader with minecraft
 ```
+
+## Credits
+[Godlander](https://github.com/Godlander/raytracing) for the idea of decoding view data in the vertex shader
+
+d (DerDiscohund) for explaining the whole concept of passing core shader values into the post shader
+
+Dominexis for some of the encoding concepts
+
+UMSOEA for explaining raytracing and some intersection functions
