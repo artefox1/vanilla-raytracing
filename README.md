@@ -48,7 +48,7 @@ data.w = dec(ivec2(3, 1)); // decode (3, 1) to data.w
 ### Fragment shader
 All of the raytracing is actually written in `program/render.fsh`.
 
-To edit the scene, you can use one of the intersection functions within the `shootRay()` function. Intersection functions typically require position data and material data. Some functions store different types of data in the same vec4 to save space. For example, sphere intersections use vec4.xyz for position coordinates and vec4.w for radius. Currently, the material struct is defined as:
+To edit the scene, you can use one of the intersection functions within the `shootRay()` function. Intersection functions typically require position data and material data. Some functions store different types of data in the same vec4 to save space. For example, sphere intersections use `vec4.xyz` for position coordinates and `vec4.w` for radius. Currently, the material struct is defined as:
 ```glsl
 struct material {
     vec4 albedo;
