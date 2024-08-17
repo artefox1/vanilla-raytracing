@@ -58,20 +58,20 @@ struct material {
 
 The default scene looks like this:
 ```glsl
-//                 Position and Radius               Albedo and Reflectivity
-addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0 ), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5)); // white sphere of 1.0 radius and 0.5 reflectivity
-addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2)); // red sphere of 0.75 radius and 0.2 reflectivity
-addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4  ), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2)); // green sphere of 0.4 radius and 0.2 reflectivity
+//              Position and Radius          Albedo and Reflectivity
+addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0 ), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
+addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
+addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4  ), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
 
-//             Plane height           Albedo and Reflectivity
-addPlane(r, h,     5.5,       material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // 0 alpha which results in an invisible shadow caster
+//             Plane height  Albedo and Reflectivity
+addPlane(r, h, 5.5,          material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // 0 alpha which results in an invisible shadow caster
 ```
 
 To add lights, use `addPointLight()` which is located in the `shadeHitData()` function. The default lighting scene looks like:
 ```glsl
-//                           Position and Intensity              Color
-addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0)); // warm light with 35 intensity
-addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec4(0.6, 0.5, 0.9, 1.0)); // blue light with 3 intensity
+//                         Position and Intensity      Color
+addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
+addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec4(0.6, 0.5, 0.9, 1.0));
 ```
 
 The raytracer then gets passed into `program/image.fsh`. This is where any color transformations such as tonemapping take place, and it's the image that gets shown on the final buffer.
