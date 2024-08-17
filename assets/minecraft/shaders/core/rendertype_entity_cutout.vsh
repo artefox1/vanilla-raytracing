@@ -49,9 +49,8 @@ void main() {
     if (ivec4(texture(Sampler0, UV0) * 255) == ivec4(12, 34, 56, 78)) {
         vec2 cornerpos = vec2(0.0, 0.0);
         cornerpos += corners[gl_VertexID % 4];
-        cornerpos.x *= 0.05;
-        cornerpos.y *= 0.02;
-        cornerpos.x /= 1920.0 / 1080.0;
+        cornerpos.x *= 0.02;
+        cornerpos.y *= 0.01;
 
         gl_Position = vec4(cornerpos * 2.0 - 1.0, 0.0, 1.0); // turn cornerpos (0 to 1) to position space (-1 to 1)
         pos = Position;
