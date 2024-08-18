@@ -37,12 +37,18 @@ vec4 sampleSky() {
     //vec2 p = floor(uv.xy * 30.0);
     //float patternMask = mod(p.x + mod(p.y, 2.0), 2.0); // checkerboard on transparent
     //col = patternMask * vec4(1.0, 1.0, 1.0, 0.0) + vec4(0.7, 0.7, 0.7, 0.0); // white is technically more than white
+    //vec4 col = vec4(
+    //        0.52156862745,
+    //        0.67058823529,
+    //        1.00000000000,
+    //        0.00000000000
+    //    ); // copy mc sky color
     vec4 col = vec4(
-            0.52156862745,
-            0.67058823529,
-            1.00000000000,
-            1.00000000000
-        ); // copy mc sky color
+        0.03921568627,
+        0.04705882352,
+        0.08235294117,
+        0.00000000000
+    );
     col.rgb = pow(col.rgb, vec3(2.2)); // transform to linear space
     return col;
 }
@@ -99,18 +105,18 @@ hit shootRay(ray r) { // general raytracing color function. does not shade anyth
     hit h;
     h.dist = MAXDIST; // start at max dist in case we dont hit anything
 
-    addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
-    addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
-    addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
-    addPlane(r, h, 5.5, material(vec4(1.0, 1.0, 1.0, 0.0), 1.0));
+    addSphere(r, h, vec4(-0.5, 6.5, -3.0, 1.0), material(vec4(1.0, 1.0, 1.0, 1.0), 0.4));
+    addSphere(r, h, vec4(0.9, 6.25, -3.5, 0.75), material(vec4(0.9, 0.1, 0.1, 1.0), 0.05));
+    addSphere(r, h, vec4(0.7, 5.9, -2.5, 0.4), material(vec4(0.1, 0.9, 0.1, 1.0), 0.1));
+    addPlane(r, h, 5.5, material(vec4(0.5, 0.5, 0.6, 0.0), 0.8));
 
-    //h.m.reflectivity = mix(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 1.0, h.m.reflectivity); // shitty fresnel
+    h.m.reflectivity = mix(min(pow(dot(h.normal, r.direction) + 1.0, 4.0) * (h.m.reflectivity > 0.01 ? 1.0 : 0.0), 0.0), 1.0, h.m.reflectivity); // shitty fresnel and clamp to 0 for some reason
 
     return h;
 }
 
 void addPointLight(inout vec4 shade, ray r, hit h, vec4 l, vec4 color) { // passes like this have inout data (thanks for UMSOEA for explaining this to me like 2 years ago)  l.xyz is pos, l.w is intesnity
-    vec4 ambient = vec4(0.04, 0.04, 0.04, 0.04);
+    vec4 ambient = vec4(0.02);
     vec3 point = hitPoint(r, h.dist);
 
     vec3 vectorToLight = l.xyz - point;
@@ -123,7 +129,7 @@ void addPointLight(inout vec4 shade, ray r, hit h, vec4 l, vec4 color) { // pass
 
     // cast shadow ray then multiply by intensity and color
     hit rayToLight = shootRay(ray(point, vectorToLight)); // actual distance to light (could get obstructed)
-    lighting *= rayToLight.dist > lightDistance ? vec4(1.0) : ambient; // 0.05x if in shadow
+    lighting *= rayToLight.dist > lightDistance ? vec4(1.0) : vec4(vec3(ambient), 1.0); // we want the shadow visible but not shadin
     vec4 col = lighting * vec4(l.w) * color; // lighting is 4d
     
     shade += col;
@@ -132,7 +138,7 @@ void addPointLight(inout vec4 shade, ray r, hit h, vec4 l, vec4 color) { // pass
 vec4 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point, in the future calc hitpoiunt in the intersection as well as dist.
     vec4 shade;
 
-    addPointLight(shade, r, h, vec4(2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
+    addPointLight(shade, r, h, vec4(2.7, 12.5, -1.0, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
     addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0), vec4(0.6, 0.5, 0.9, 1.0));
 
     shade.rgb *= h.m.albedo.rgb; // tint by albedo
@@ -141,6 +147,11 @@ vec4 shadeHitData(ray r, hit h) { // we need the ray to calculate hit point, in 
     if (h.dist == MAXDIST) shade = sampleSky();
 
     return shade;
+}
+
+vec4 getColor(ray r, inout hit h) {
+    h = shootRay(r);
+    return shadeHitData(r, h);
 }
 
 void main() {
@@ -152,12 +163,17 @@ void main() {
     r.direction = normalize(uv) * mat3(mvmat); // is just a direction vector not changing with ro
 
     vec4 col;
+    hit h;
 
-    // THE ALMIGHTY FUNCTION
-    col = shadeHitData(r, shootRay(r));
+    float reflectivity;
 
-    if (shootRay(r).dist == MAXDIST) { // sky alpha invisible if in main bounce
-        col.a = 0.0;
-    };
+    col = getColor(r, h);
+    reflectivity = h.m.reflectivity;
+    col = mix(col, getColor(ray(hitPoint(r, h.dist), reflect(r.direction, h.normal)), h), reflectivity);
+    
+    col.a = 1.0;
+    vec4 main = getColor(r, h);
+    col.a = main.a; // only use alpha if in main bounce
+
     fragColor = col; // send raw raytracer to swap
 }

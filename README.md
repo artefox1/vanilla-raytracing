@@ -15,6 +15,12 @@ The shader uses an `item_display` as a mud block to get the core values. To run 
 summon item_display 0.0 0 0.0 {item:{id:"minecraft:mud"}}
 ```
 
+It's also recommended to set the time to midnight
+```mcfunction
+gamerule doDaylightCycle false
+time set midnight
+```
+
 # Editing files
 ## Core shaders
 All of the core shaders are located in `shaders/core`.
@@ -63,28 +69,29 @@ struct material {
 The default scene looks like this:
 ```glsl
 //              Position and Radius              Albedo and Reflectivity
-addSphere(r, h, vec4(-0.5,  6.5,  -3.0, 1.0 ),   material(vec4(1.0, 1.0, 1.0, 1.0), 0.5));
-addSphere(r, h, vec4( 0.9,  6.25, -3.5, 0.75),   material(vec4(0.9, 0.1, 0.1, 1.0), 0.2));
-addSphere(r, h, vec4( 0.7,  5.9,  -2.5, 0.4 ),   material(vec4(0.1, 0.9, 0.1, 1.0), 0.2));
+addSphere(r, h, vec4(-0.5,  6.5,  -3.0, 1.0 ),   material(vec4(1.0, 1.0, 1.0, 1.0), 0.4 ));
+addSphere(r, h, vec4( 0.9,  6.25, -3.5, 0.75),   material(vec4(0.9, 0.1, 0.1, 1.0), 0.05));
+addSphere(r, h, vec4( 0.7,  5.9,  -2.5, 0.4 ),   material(vec4(0.1, 0.9, 0.1, 1.0), 0.1 ));
 
 //             Plane height   Albedo and Reflectivity
-addPlane(r, h, 5.5,           material(vec4(1.0, 1.0, 1.0, 0.0), 1.0)); // 0 alpha which results in an invisible shadow caster
+addPlane(r, h, 5.5,           material(vec4(0.5, 0.5, 0.6, 0.0), 0.8)); // 0 alpha which results in an invisible shadow caster
 ```
 
 To add lights, use `addPointLight()` which is located in the `shadeHitData()` function. The default lighting scene looks like:
 ```glsl
-//                         Position and Intensity      Color
-addPointLight(shade, r, h, vec4( 2.7, 12.5, 0.3, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
-addPointLight(shade, r, h, vec4(-4.0, 9.0, -2.0, 3.0 ), vec4(0.6, 0.5, 0.9, 1.0));
+//                         Position and Intensity        Color
+addPointLight(shade, r, h, vec4( 2.7, 12.5, -1.0, 35.0), vec4(1.0, 0.9, 0.8, 1.0));
+addPointLight(shade, r, h, vec4(-4.0, 9.0,  -2.0, 3.0 ), vec4(0.6, 0.5, 0.9, 1.0));
 ```
 
 The raytracer then gets passed into `program/image.fsh`. This is where any color transformations such as tonemapping take place, and it's the image that gets shown on the final buffer.
 
 To overlay the raytracer on the minecraft buffer, I used the `mix()` function to lerp along the `alpha` channel.
 ```glsl
-vec4 mc = texture(DiffuseSampler, texCoord); // default minecraft buffer
-vec4 color;                                  // overlay shader
-mix(mc.rgb, color.rgb, color.a);             // blend the shader with minecraft
+vec4 mc    = texture(DefaultSampler, texCoord); // default minecraft buffer
+vec4 color = texture(DiffuseSampler, texCoord); // overlay shader
+
+mix(mc.rgb, color.rgb, color.a);                // blend the shader with minecraft
 ```
 
 # Credits
