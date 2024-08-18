@@ -1,11 +1,7 @@
 # Vanilla Shader Raytracing in Minecraft 1.21
-Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the concept of passing core values into post shaders. Scroll down below for the extended credits.
+Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the concept of passing core values into post shaders. Scroll down below for the extended credits and screenshots.
 
-![1](https://github.com/user-attachments/assets/6c65f8c0-3c9d-48ce-90b7-de4070d58833)
-
-![2024-08-17_15 50 22](https://github.com/user-attachments/assets/9975dd17-fc12-473e-bf5d-0b310ebe3654)
-
-https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
+https://github.com/user-attachments/assets/1d20e644-4acb-49f8-a567-e5870a53e1b4
 
 The core shader transforms the vertices of an item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 
@@ -15,7 +11,7 @@ The shader uses an `item_display` as a mud block to get the core values. To run 
 summon item_display 0.0 0 0.0 {item:{id:"minecraft:mud"}}
 ```
 
-It's also recommended to set the time to midnight
+It's also recommended to set the time to midnight:
 ```mcfunction
 gamerule doDaylightCycle false
 time set midnight
@@ -93,6 +89,23 @@ vec4 color = texture(DiffuseSampler, texCoord); // overlay shader
 
 mix(mc.rgb, color.rgb, color.a);                // blend the shader with minecraft
 ```
+
+# Screenshots
+![1](https://github.com/user-attachments/assets/6c65f8c0-3c9d-48ce-90b7-de4070d58833)
+
+![2024-08-17_15 41 42](https://github.com/user-attachments/assets/151befb3-eb57-4326-9e8b-eceadc8485b8)
+
+![2024-08-17_15 50 22](https://github.com/user-attachments/assets/9975dd17-fc12-473e-bf5d-0b310ebe3654)
+
+![2024-08-17_02 09 23](https://github.com/user-attachments/assets/c51493b3-4bea-49c0-876c-e00a32fd95df)
+
+![2024-08-14_16 26 16](https://github.com/user-attachments/assets/9aa7e029-1ed6-487a-b103-d2f167feacc9)
+
+![2024-08-18_13 29 02](https://github.com/user-attachments/assets/e12a3c5c-be23-4bc4-8034-1dd8fa342c98)
+
+https://github.com/user-attachments/assets/1132ca1d-f0e0-47d7-b76e-f6dc681d53c2
+
+https://github.com/user-attachments/assets/00238f7b-3979-4010-99d2-4dcd30760003
 
 # Credits
 Godlander
