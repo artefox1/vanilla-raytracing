@@ -3,8 +3,6 @@ Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the con
 
 https://github.com/user-attachments/assets/1d20e644-4acb-49f8-a567-e5870a53e1b4
 
-The core shader transforms the vertices of an item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
-
 ## Usage
 The shader uses an `item_display` as a mud block to get the core values. To run the shader at world origin, simply run:
 ```mcfunction
@@ -18,6 +16,7 @@ time set midnight
 ```
 
 # Editing files
+The core shader transforms the vertices of an item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 ## Core shaders
 All of the core shaders are located in `shaders/core`.
 ### Vertex shader
