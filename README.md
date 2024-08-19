@@ -4,6 +4,8 @@ Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the con
 https://github.com/user-attachments/assets/1d20e644-4acb-49f8-a567-e5870a53e1b4
 
 ## Usage
+This resource pack requires the *Fabulous!* graphics setting in order to work properly.
+
 The shader uses an `item_display` as a mud block to get the core values. To run the shader at world origin, simply run:
 ```mcfunction
 summon item_display 0.0 0 0.0 {item:{id:"minecraft:mud"}}
