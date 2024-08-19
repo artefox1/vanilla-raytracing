@@ -19,7 +19,7 @@ time set midnight
 ```
 
 # Editing files
-The core shader transforms the vertices of an item display to cover a small portion of the screen, then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
+The core shader transforms the vertices of an item display to cover a small portion of the screen (bottom left corner), then encodes a couple of variables to the texture such as the view matrix and position. Since each fragment has 8-bit RGBA color channels, we can encode one 32-bit float per pixel. Then, the post shader decodes the buffer and passes it to the fragment post shader to do the raytracing.
 ## Core shaders
 All of the core shaders are located in `shaders/core`.
 ### Vertex shader
