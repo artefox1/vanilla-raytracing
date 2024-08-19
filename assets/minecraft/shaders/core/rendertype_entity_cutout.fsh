@@ -49,9 +49,11 @@ void main() {
         for (int i = 0; i < 4; i++) { plot(vec2(i + 12, 0.0), ModelViewMat[i][3], col); }
     
         // plot coordinates to pixels 16, 17, 18
-        plot(vec2(16.0, 0.0), pos.x, col);
-        plot(vec2(17.0, 0.0), pos.y, col);
-        plot(vec2(18.0, 0.0), pos.z, col);
+        plot(vec2(0.0, 1.0), pos.x, col);
+        plot(vec2(1.0, 1.0), pos.y, col);
+        plot(vec2(2.0, 1.0), pos.z, col);
+
+        plot(vec2(0.0, 2.0), ProjMat[1][1], col);
 
         fragColor = col;
     } else {

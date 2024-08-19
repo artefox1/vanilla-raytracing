@@ -50,7 +50,7 @@ void main() {
         vec2 cornerpos = vec2(0.0, 0.0);
         cornerpos += corners[gl_VertexID % 4];
         cornerpos.x *= 0.02;
-        cornerpos.y *= 0.01;
+        cornerpos.y *= 0.02;
 
         gl_Position = vec4(cornerpos * 2.0 - 1.0, 0.0, 1.0); // turn cornerpos (0 to 1) to position space (-1 to 1)
         pos = Position;

@@ -10,6 +10,7 @@ out vec2 texCoord;
 // pass our passed data to fsh
 out mat4 mvmat;
 out vec3 pos;
+out float focal;
 
 // we need the sampler too
 uniform sampler2D DiffuseSampler;
@@ -50,9 +51,11 @@ void main(){
     mvmat[3][3] = dec(ivec2(15, 0));
 
     // decode coordinates 16, 17, 18
-    pos.x = channelsToFloat(texelFetch(DiffuseSampler, ivec2(16, 0), 0));
-    pos.y = channelsToFloat(texelFetch(DiffuseSampler, ivec2(17, 0), 0));
-    pos.z = channelsToFloat(texelFetch(DiffuseSampler, ivec2(18, 0), 0));
+    pos.x = channelsToFloat(texelFetch(DiffuseSampler, ivec2(0, 1), 0));
+    pos.y = channelsToFloat(texelFetch(DiffuseSampler, ivec2(1, 1), 0));
+    pos.z = channelsToFloat(texelFetch(DiffuseSampler, ivec2(2, 1), 0));
+
+    focal = channelsToFloat(texelFetch(DiffuseSampler, ivec2(0, 2), 0));
 
     vec4 outPos = ProjMat * vec4(Position.xy, 0.0, 1.0);
     gl_Position = vec4(outPos.xy, 0.2, 1.0);

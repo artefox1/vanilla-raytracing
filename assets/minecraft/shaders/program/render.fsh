@@ -16,6 +16,7 @@ out vec4 fragColor;
 // pass in mvmat and pos
 in mat4 mvmat;
 in vec3 pos;
+in float focal;
 
 struct ray {
     vec3 origin;
@@ -155,7 +156,7 @@ vec4 getColor(ray r, inout hit h) {
 }
 
 void main() {
-    vec3 uv = vec3(texCoord * 2.0 - 1.0, -1.0); // coords from -1 to 1
+    vec3 uv = vec3(texCoord * 2.0 - 1.0, -focal); // coords from -1 to 1
     uv.x *= OutSize.x / OutSize.y; // correct aspect ratio
     
     ray r;
