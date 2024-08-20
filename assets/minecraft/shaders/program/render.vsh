@@ -55,6 +55,7 @@ void main(){
     pos.y = channelsToFloat(texelFetch(DiffuseSampler, ivec2(1, 1), 0));
     pos.z = channelsToFloat(texelFetch(DiffuseSampler, ivec2(2, 1), 0));
 
+    // get fov in focal length space, no trig shit lets goooo
     focal = channelsToFloat(texelFetch(DiffuseSampler, ivec2(0, 2), 0));
 
     vec4 outPos = ProjMat * vec4(Position.xy, 0.0, 1.0);

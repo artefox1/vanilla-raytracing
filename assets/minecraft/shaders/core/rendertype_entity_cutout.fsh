@@ -52,7 +52,8 @@ void main() {
         plot(vec2(0.0, 1.0), pos.x, col);
         plot(vec2(1.0, 1.0), pos.y, col);
         plot(vec2(2.0, 1.0), pos.z, col);
-
+        
+        // plot focal length
         plot(vec2(0.0, 2.0), ProjMat[1][1], col);
 
         fragColor = col;
