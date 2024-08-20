@@ -4,8 +4,10 @@ Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the con
 https://github.com/user-attachments/assets/1d20e644-4acb-49f8-a567-e5870a53e1b4
 
 ## Usage
-This resource pack requires the *Fabulous!* graphics setting in order to work properly.
-![image](https://github.com/user-attachments/assets/8aec2ee8-2b45-4388-b421-ba9afa4fd64b)
+This resource pack requires the *Fabulous!* graphics setting, and View Bobbing turned off in order to work properly.
+
+![better fabulous](https://github.com/user-attachments/assets/ac56a580-5ed1-4a8c-8b26-a2b43e726239)
+![better view bobbing](https://github.com/user-attachments/assets/809d62c8-4185-435a-b42a-68154e395dbc)
 
 The shader uses an `item_display` as a mud block to get the core values. To run the shader at world origin, simply run:
 ```mcfunction
