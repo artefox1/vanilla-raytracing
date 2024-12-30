@@ -1,5 +1,5 @@
 # Vanilla Shader Raytracing in Minecraft 1.21
-Credit to [Godlander](https://github.com/Godlander/raytracing) and d for the concept of passing core values into post shaders. Scroll down below for screenshots.
+Credit to [Godlander](https://github.com/Godlander/raytracing) and thederdiscohund for the concept of passing core values into post shaders. Scroll down below for screenshots.
 
 https://github.com/user-attachments/assets/1d20e644-4acb-49f8-a567-e5870a53e1b4
 
